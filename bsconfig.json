@@ -23,7 +23,11 @@
     "reason-react",
     "bs-fetch",
     "remotedata-re",
-    "@jsiebern/bs-material-ui"
+    "@jsiebern/bs-material-ui",
+    "decco"
   ],
-  "refmt": 3
+  "refmt": 3,
+  "ppx-flags": [
+    "decco/ppx"
+  ]
 }

@@ -6,8 +6,9 @@ type json_t = Js.Json.t
 type result_t<'a, 'b> = Result.t<'a, 'b>
 type decode_t<'a, 'b> = result_t<'a, 'b>
 type decoder_t<'a, 'b> = json_t => decode_t<'a, 'b>
-type response_t<'a> = result_t<'a, string>
+// type response_t<'a> = result_t<'a, string>
 type promise_t<'a> = Js.Promise.t<'a>
+type gethook_t<'a> = (state_t<'a>, string => unit, unit => unit)
 
 let note = (o: option<'a>, e: 'e): result_t<'a, 'e> =>
   switch o {
@@ -21,7 +22,7 @@ module API = (Fetcher: Http.Fetcher) => {
     open Js.Promise
     Fetcher.fetch(url) |> then_(json =>
       json
-      ->note("Network error!")
+      ->note("Network Error")
       ->Result.flatMap(json => json->decode)
       ->(result =>
         switch result {
@@ -34,7 +35,7 @@ module API = (Fetcher: Http.Fetcher) => {
   }
 
   module Hook = {
-    let useGet = (decoder: decoder_t<'a, 'b>): (state_t<'a>, string => unit, unit => unit) => {
+    let useGet = (decoder: decoder_t<'a, 'b>): gethook_t<'a> => {
       let (state, setState) = React.useState(() => RemoteData.NotAsked)
       let set_state = s => setState(_prevState => s)
       let reset = () => NotAsked->set_state
