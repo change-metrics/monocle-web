@@ -7,10 +7,7 @@
     "dir": "src",
     "subdirs": true
   },
-  "bsc-flags": [
-    "-bs-super-errors",
-    "-bs-no-version-header"
-  ],
+  "bsc-flags": ["-bs-super-errors", "-bs-no-version-header"],
   "package-specs": [
     {
       "module": "commonjs",
@@ -19,15 +16,7 @@
   ],
   "suffix": ".bs.js",
   "namespace": true,
-  "bs-dependencies": [
-    "reason-react",
-    "bs-fetch",
-    "remotedata-re",
-    "re-tailwind",
-    "decco"
-  ],
+  "bs-dependencies": ["reason-react", "bs-fetch", "remotedata-re", "decco"],
   "refmt": 3,
-  "ppx-flags": [
-    "decco/ppx"
-  ]
+  "ppx-flags": ["decco/ppx"]
 }

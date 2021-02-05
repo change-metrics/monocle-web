@@ -7,14 +7,14 @@
     "build": "bsb -make-world",
     "start": "bsb -make-world -w",
     "serve": "mkdir -p dist && cp tests/assets/*.json dist/ && parcel serve ./src/index.html",
-    "clean": "find src/ tests/ -name '*.bs.js' -delete && rm -Rf lib node_modules"
+    "clean": "find src/ tests/ -name '*.bs.js' -delete && rm -Rf lib node_modules",
+    "dist": "parcel build ./src/index.html --public-url /"
   },
   "dependencies": {
     "@patternfly/react-core": "^4.90.2",
     "@patternfly/react-table": "^4.20.15",
     "bs-fetch": "^0.6.2",
     "decco": "^1.3.0",
-    "re-tailwind": "0.0.10",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "reason-react": "^0.9.1",
@@ -22,6 +22,11 @@
   },
   "devDependencies": {
     "bs-platform": "^8.2.0",
+    "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.0.2",
+    "@tailwindcss/postcss7-compat": "^2.0.2",
+    "autoprefixer": "^9",
+    "postcss": "^7",
+    "cssnano": "^4.1.10",
     "parcel": "^1.12.4"
   }
 }
