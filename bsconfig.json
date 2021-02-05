@@ -23,7 +23,7 @@
     "reason-react",
     "bs-fetch",
     "remotedata-re",
-    "@softwarefactory-project/re-patternfly",
+    "re-tailwind",
     "decco"
   ],
   "refmt": 3,

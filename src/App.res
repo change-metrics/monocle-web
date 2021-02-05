@@ -1,5 +1,7 @@
-open Patternfly
 open Belt
+open TW
+
+%%raw(`require("tailwindcss/dist/tailwind.min.css")`)
 
 let listToReactArray = xs => xs->Belt.List.toArray->React.array
 
@@ -50,37 +52,29 @@ module Indices = {
     switch state {
     | NotAsked
     | Loading(_) => React.null
-    | Success(data) => {
-        let rows = data->Belt.List.map(name => {cells: [name]})->Belt.List.toArray
-        <Table caption="Test" rows cells=[{title: "Indice name", transforms: []}]>
-          <TableHeader /> <TableBody />
-        </Table>
-      }
+    | Success(data) => <p> {"Success"->React.string} </p>
     | Failure(_) => <p> {"Unable to load the indices"->React.string} </p>
     }
+  }
+}
+
+let tw = (styles: array<TW.t>) => styles->Belt.List.fromArray->make
+
+// <Indices hook=API.Hook.useGet />
+module Example = {
+  @react.component
+  let make = () => {
+    <div className={[Display(Flex), BackgroundColor(BgRed500), TextColor(TextYellow300)]->tw}>
+      <p>{"Hello Example"->React.string}</p>
+    </div>;
   }
 }
 
 module Main = (Fetcher: Http.Fetcher) => {
   module API = RemoteApi.API(Http.BsFetch)
 
-  let header =
-    <PageHeader
-      logo={<Asset.Logo name="monocle" link="/" />}
-      headerTools={<PageHeaderTools>
-        <PageHeaderToolsItem>
-          <Button variant=#Plain> <Icons.Help /> </Button>
-        </PageHeaderToolsItem>
-      </PageHeaderTools>}
-    />
-
   @react.component
   let make = () => {
-    <Page header>
-      <PageSection isFilled=true> <Indices hook=API.Hook.useGet /> </PageSection>
-      <PageSection variant=#Darker isFilled=true>
-        {"Placeholder footer"->React.string}
-      </PageSection>
-    </Page>
+    <Example />
   }
 }
