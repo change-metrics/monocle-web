@@ -61,12 +61,19 @@ module Indices = {
 let tw = (styles: array<TW.t>) => styles->Belt.List.fromArray->make
 
 // <Indices hook=API.Hook.useGet />
+    // <div className={[Display(Flex), BackgroundColor(BgRed500), TextColor(TextYellow300)]->tw}>
+    //   <p>{"Hello Example"->React.string}</p>
+    // </div>;
 module Example = {
   @react.component
   let make = () => {
-    <div className={[Display(Flex), BackgroundColor(BgRed500), TextColor(TextYellow300)]->tw}>
-      <p>{"Hello Example"->React.string}</p>
-    </div>;
+    <div className="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-md flex items-center space-x-4">
+  <div className="flex-shrink-0">
+    <img className="h-12 w-12" src="/img/logo.svg" alt="ChitChat Logo" ></img>
+    </div>
+      <div className="text-xl font-medium text-black">{"ChitChat"->React.string}</div>
+    <p className="text-gray-500">{"You have a new message!"->React.string}</p>
+  </div>
   }
 }
 
