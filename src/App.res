@@ -37,7 +37,26 @@ module Layout = {
       <div className={"container mx-auto py-1"}> {children} </div>
   }
 
+  module ToolTip = {
+    // https://github.com/Cosbgn/tailwindcss-tooltips
+    @react.component
+    let make = (~tip: React.element, ~children: 'children) =>
+      <p className="tooltip">
+        {children} <span className="tooltip-text bg-blue-200  rounded"> {tip} </span>
+      </p>
+  }
+
   module Box = {
+    module SimpleHeader = {
+      @react.component
+      let make = (~title: string, ~tooltip: React.element) => {
+        <div className="grid grid-cols-6 gap-4">
+          <div className="col-start-1 col-span-3"> {title->React.string} </div>
+          <div className="col-start-4 col-span-5 text-right pr-2"> {tooltip} </div>
+        </div>
+      }
+    }
+
     @react.component
     let make = (
       ~header: option<React.element>=?,
@@ -45,29 +64,31 @@ module Layout = {
       ~children: 'children,
     ) =>
       <Container>
-        {switch header {
-        | Some(header) =>
-          <div
-            className="border-gray-200 border-l-4 border-r-4 border-t-4 border-b-2 flex bg-gray-400">
-            <div className="pt-2 pl-2 pb-2"> {header} </div>
-          </div>
+        <div className="shadow-lg">
+          {switch header {
+          | Some(header) =>
+            <div
+              className="border-gray-200 border-l-2 border-r-2 border-t-2 border-b-2 flex bg-gray-400">
+              <div className="pt-2 pl-2 pb-2 w-full"> {header} </div>
+            </div>
 
-        | None => React.null
-        }}
-        <div
-          className={"border-gray-200 border-l-4 border-r-4 flex bg-white" ++
-          (header->Belt.Option.isNone ? " border-t-4" : "") ++ (
-            footer->Belt.Option.isNone ? " border-b-4" : ""
-          )}>
-          <div className="pt-2 pl-2 pb-2 w-full"> {children} </div>
-        </div>
-        {switch footer {
-        | Some(footer) =>
-          <div className="border-gray-200 border-l-4 border-r-4 border-b-4 flex bg-white">
-            <div className="pt-2 pl-2 pb-2"> {footer} </div>
+          | None => React.null
+          }}
+          <div
+            className={"border-gray-200 border-l-2 border-r-2 flex bg-white" ++
+            (header->Belt.Option.isNone ? " border-t-2" : "") ++ (
+              footer->Belt.Option.isNone ? " border-b-2" : ""
+            )}>
+            <div className="pt-2 pl-2 pb-2 w-full"> {children} </div>
           </div>
-        | None => React.null
-        }}
+          {switch footer {
+          | Some(footer) =>
+            <div className="border-gray-200 border-l-2 border-r-2 border-b-2 flex bg-white">
+              <div className="pt-2 pl-2 pb-2"> {footer} </div>
+            </div>
+          | None => React.null
+          }}
+        </div>
       </Container>
   }
 
@@ -153,17 +174,24 @@ module Main = (Fetcher: Http.Fetcher) => {
 
   @react.component
   let make = () => {
+    let tip =
+      <Layout.ToolTip tip={"Here are the list of Monocle indexes. Select one."->React.string}>
+        {"?"->React.string}
+      </Layout.ToolTip>
+    let header = <Layout.Box.SimpleHeader title="Database indices" tooltip={tip} />
     <React.Fragment>
       <Nav
         sections=list{{name: "Main", link: "/"}, {name: "People", link: "/people"}}
         selected=Some("Main")
       />
       <Layout.Container>
-        {[
-          <Layout.Box header={"Database indices"->React.string}>
-            <Indices hook=API.Hook.useGet />
-          </Layout.Box>,
-        ]->Layout.vblockAlign(2)}
+        <div className="grid grid-cols-12 gap-4">
+          <div className="col-start-4 col-end-10">
+            {[
+              <Layout.Box header> <Indices hook=API.Hook.useGet /> </Layout.Box>,
+            ]->Layout.vblockAlign(2)}
+          </div>
+        </div>
       </Layout.Container>
     </React.Fragment>
   }
