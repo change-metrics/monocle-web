@@ -30,6 +30,54 @@ module Asset = {
   }
 }
 
+module Layout = {
+  module Container = {
+    @react.component
+    let make = (~children: 'children) =>
+      <div className={"container mx-auto py-1"}> {children} </div>
+  }
+
+  module Box = {
+    @react.component
+    let make = (
+      ~header: option<React.element>=?,
+      ~footer: option<React.element>=?,
+      ~children: 'children,
+    ) =>
+      <Container>
+        {switch header {
+        | Some(header) =>
+          <div
+            className="border-gray-200 border-l-4 border-r-4 border-t-4 border-b-2 flex bg-gray-400">
+            <div className="pt-2 pl-2 pb-2"> {header} </div>
+          </div>
+
+        | None => React.null
+        }}
+        <div
+          className={"border-gray-200 border-l-4 border-r-4 flex bg-white" ++
+          (header->Belt.Option.isNone ? " border-t-4" : "") ++ (
+            footer->Belt.Option.isNone ? " border-b-4" : ""
+          )}>
+          <div className="pt-2 pl-2 pb-2 w-full"> {children} </div>
+        </div>
+        {switch footer {
+        | Some(footer) =>
+          <div className="border-gray-200 border-l-4 border-r-4 border-b-4 flex bg-white">
+            <div className="pt-2 pl-2 pb-2"> {footer} </div>
+          </div>
+        | None => React.null
+        }}
+      </Container>
+  }
+
+  let vblockAlign = (elms: array<React.element>, padding: int): React.element => {
+    <div className={"space-y-" ++ string_of_int(padding)}>
+      {elms->Belt.Array.map(elm => <span className="block"> {elm} </span>)->React.array}
+    </div>
+  }
+}
+
 module Nav = {
   type t = {
     name: string,
@@ -44,6 +92,7 @@ module Nav = {
           ? "bg-gray-900 text-white"
           : "text-gray-300 hover:bg-gray-700 hover:text-white"
       <a
+        key={section.name}
         href={section.link}
         className={classes ++ "bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium"}>
         {section.name->React.string}
@@ -76,14 +125,11 @@ module Indices = {
     }
 
   let renderIndice = (x: string) => {
-    <div
-      className="p-6 max-w-sm mx-auto rounded-x1 show-md items-center bg-white flex space-x-4 hover:bg-yellow-100">
-      {x->React.string}
-    </div>
+    <div className="flex justify-center w-full hover:bg-gray-100"> {x->React.string} </div>
   }
 
   let render = (xs: indices) => {
-    <ul> {xs->Belt.List.map(x => <li key={x}> {x->renderIndice} </li>)->listToReactArray} </ul>
+    <div> {xs->Belt.List.map(x => x->renderIndice)->Belt.List.toArray->Layout.vblockAlign(1)} </div>
   }
 
   @react.component
@@ -112,7 +158,13 @@ module Main = (Fetcher: Http.Fetcher) => {
         sections=list{{name: "Main", link: "/"}, {name: "People", link: "/people"}}
         selected=Some("Main")
       />
-      <Indices hook=API.Hook.useGet />
+      <Layout.Container>
+        {[
+          <Layout.Box header={"Database indices"->React.string}>
+            <Indices hook=API.Hook.useGet />
+          </Layout.Box>,
+        ]->Layout.vblockAlign(2)}
+      </Layout.Container>
     </React.Fragment>
   }
 }
