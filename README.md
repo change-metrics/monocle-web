@@ -13,13 +13,21 @@ popd
 
 ## Run the developpement server
 
-```bash
-npm install
-npm start
+Install pnpm first using `npm install -g pnpm`
+
+```ShellSession
+pnpm install
+pnpm start
 ```
 
 In another shell start the developpement server
 
-```bash
-npm run serve
+```ShellSession
+pnpm run serve
+```
+
+Distribute the interface
+
+```ShellSession
+pnpm run dist
 ```

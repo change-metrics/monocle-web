@@ -1,9 +1,7 @@
 open Belt
-open TW
 
-%%raw(`require("tailwindcss/dist/tailwind.min.css")`)
-
-let listToReactArray = xs => xs->Belt.List.toArray->React.array
+let listToReactArray: list<React.element> => React.element = xs =>
+  xs->Belt.List.toArray->React.array
 
 let displayImg = (width: string, height, src: string, alt: string) => {
   <img
@@ -32,6 +30,42 @@ module Asset = {
   }
 }
 
+module Nav = {
+  type t = {
+    name: string,
+    link: string,
+  }
+
+  @react.component
+  let make = (~sections: list<t>, ~selected: option<string>) => {
+    let makeLink = (section: t) => {
+      let classes =
+        section.name == selected->Belt.Option.getWithDefault("")
+          ? "bg-gray-900 text-white"
+          : "text-gray-300 hover:bg-gray-700 hover:text-white"
+      <a
+        href={section.link}
+        className={classes ++ "bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium"}>
+        {section.name->React.string}
+      </a>
+    }
+    <nav className="bg-gray-800">
+      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+        <div className="relative flex items-center justify-between h-16">
+          <div
+            className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
+            <div className="hidden sm:block sm:ml-6">
+              <div className="flex space-x-4">
+                {sections->Belt.List.map(makeLink)->listToReactArray}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+  }
+}
+
 module Indices = {
   @decco type indices = list<string>
 
@@ -40,6 +74,17 @@ module Indices = {
     | Ok(data) => data->Ok
     | Error(err) => ("Decoding Error: " ++ err.message)->Error
     }
+
+  let renderIndice = (x: string) => {
+    <div
+      className="p-6 max-w-sm mx-auto rounded-x1 show-md items-center bg-white flex space-x-4 hover:bg-yellow-100">
+      {x->React.string}
+    </div>
+  }
+
+  let render = (xs: indices) => {
+    <ul> {xs->Belt.List.map(x => <li key={x}> {x->renderIndice} </li>)->listToReactArray} </ul>
+  }
 
   @react.component
   let make = (~hook: RemoteApi.decoder_t<'a, 'b> => RemoteApi.gethook_t<'a>) => {
@@ -50,30 +95,10 @@ module Indices = {
     | _ => ()
     }
     switch state {
-    | NotAsked
-    | Loading(_) => React.null
-    | Success(data) => <p> {"Success"->React.string} </p>
+    | NotAsked | Loading(_) => React.null
+    | Success(data) => render(data)
     | Failure(_) => <p> {"Unable to load the indices"->React.string} </p>
     }
-  }
-}
-
-let tw = (styles: array<TW.t>) => styles->Belt.List.fromArray->make
-
-// <Indices hook=API.Hook.useGet />
-    // <div className={[Display(Flex), BackgroundColor(BgRed500), TextColor(TextYellow300)]->tw}>
-    //   <p>{"Hello Example"->React.string}</p>
-    // </div>;
-module Example = {
-  @react.component
-  let make = () => {
-    <div className="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-md flex items-center space-x-4">
-  <div className="flex-shrink-0">
-    <img className="h-12 w-12" src="/img/logo.svg" alt="ChitChat Logo" ></img>
-    </div>
-      <div className="text-xl font-medium text-black">{"ChitChat"->React.string}</div>
-    <p className="text-gray-500">{"You have a new message!"->React.string}</p>
-  </div>
   }
 }
 
@@ -82,6 +107,12 @@ module Main = (Fetcher: Http.Fetcher) => {
 
   @react.component
   let make = () => {
-    <Example />
+    <React.Fragment>
+      <Nav
+        sections=list{{name: "Main", link: "/"}, {name: "People", link: "/people"}}
+        selected=Some("Main")
+      />
+      <Indices hook=API.Hook.useGet />
+    </React.Fragment>
   }
 }
