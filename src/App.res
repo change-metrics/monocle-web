@@ -103,7 +103,7 @@ module Indices = {
 }
 
 module Main = (Fetcher: Http.Fetcher) => {
-  module API = RemoteApi.API(Http.BsFetch)
+  module API = RemoteApi.API(Fetcher)
 
   @react.component
   let make = () => {
