@@ -166,12 +166,15 @@ module Indices = {
     | Error(err) => ("Decoding Error: " ++ err.message)->Error
     }
 
-  let renderIndice = (x: string) => {
-    <div className="flex justify-center w-full hover:bg-gray-100"> {x->React.string} </div>
-  }
-
   let render = (xs: indices) => {
-    <div> {xs->Belt.List.map(x => x->renderIndice)->Belt.List.toArray->Layout.vblockAlign(1)} </div>
+    let tip = Layout.getHelpToolTip("Here are the list of Monocle indexes. Select one.")
+    let header = <Layout.Box.SimpleHeader title="Database indices" tooltip={tip} />
+    let renderIndice = (x: string) => {
+      <div className="flex justify-center w-full hover:bg-gray-100"> {x->React.string} </div>
+    }
+    <Layout.Box header>
+      {xs->Belt.List.map(x => x->renderIndice)->Belt.List.toArray->Layout.vblockAlign(1)}
+    </Layout.Box>
   }
 
   @react.component
@@ -195,8 +198,6 @@ module Main = (Fetcher: Http.Fetcher) => {
 
   @react.component
   let make = () => {
-    let tip = Layout.getHelpToolTip("Here are the list of Monocle indexes. Select one.")
-    let header = <Layout.Box.SimpleHeader title="Database indices" tooltip={tip} />
     <React.Fragment>
       <Nav
         sections=list{{name: "Main", link: "/"}, {name: "People", link: "/people"}}
@@ -205,9 +206,7 @@ module Main = (Fetcher: Http.Fetcher) => {
       <Layout.Container>
         <div className="grid grid-cols-12 gap-4">
           <div className="col-start-4 col-end-10">
-            {[
-              <Layout.Box header> <Indices hook=API.Hook.useGet /> </Layout.Box>,
-            ]->Layout.vblockAlign(2)}
+            {[<Indices hook=API.Hook.useGet />]->Layout.vblockAlign(2)}
           </div>
         </div>
       </Layout.Container>
