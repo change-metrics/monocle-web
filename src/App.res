@@ -9,6 +9,18 @@ let displayImg = (width: string, height, src: string, alt: string) => {
   />
 }
 
+module Heroicons = {
+  let informationCircleIcon =
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={"2"}
+        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+      />
+    </svg>
+}
+
 module Asset = {
   // require binding does not support complex string manipulation
   @bs.val external require: string => string = "require"
@@ -41,18 +53,23 @@ module Layout = {
     // https://github.com/Cosbgn/tailwindcss-tooltips
     @react.component
     let make = (~tip: React.element, ~children: 'children) =>
-      <p className="tooltip">
+      <div className="tooltip">
         {children} <span className="tooltip-text bg-blue-200  rounded"> {tip} </span>
-      </p>
+      </div>
   }
+
+  let getHelpToolTip = (text: string) =>
+    <ToolTip tip={text->React.string}>
+      <div className="w-4 h-4"> {Heroicons.informationCircleIcon} </div>
+    </ToolTip>
 
   module Box = {
     module SimpleHeader = {
       @react.component
       let make = (~title: string, ~tooltip: React.element) => {
-        <div className="grid grid-cols-6 gap-4">
-          <div className="col-start-1 col-span-3"> {title->React.string} </div>
-          <div className="col-start-4 col-span-5 text-right pr-2"> {tooltip} </div>
+        <div className="grid grid-cols-12">
+          <div className="col-start-1 col-span-11"> {title->React.string} </div>
+          <div className="col-start-12 col-span-1"> {tooltip} </div>
         </div>
       }
     }
@@ -94,7 +111,11 @@ module Layout = {
 
   let vblockAlign = (elms: array<React.element>, padding: int): React.element => {
     <div className={"space-y-" ++ string_of_int(padding)}>
-      {elms->Belt.Array.map(elm => <span className="block"> {elm} </span>)->React.array}
+      {elms
+      ->Belt.Array.mapWithIndex((i, elm) =>
+        <span key={i->string_of_int} className="block"> {elm} </span>
+      )
+      ->React.array}
     </div>
   }
 }
@@ -174,10 +195,7 @@ module Main = (Fetcher: Http.Fetcher) => {
 
   @react.component
   let make = () => {
-    let tip =
-      <Layout.ToolTip tip={"Here are the list of Monocle indexes. Select one."->React.string}>
-        {"?"->React.string}
-      </Layout.ToolTip>
+    let tip = Layout.getHelpToolTip("Here are the list of Monocle indexes. Select one.")
     let header = <Layout.Box.SimpleHeader title="Database indices" tooltip={tip} />
     <React.Fragment>
       <Nav
