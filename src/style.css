@@ -11,7 +11,7 @@ body {
 }
 
 .tooltip .tooltip-text {
-  @apply invisible absolute z-50 inline-block text-sm w-48 rounded-lg bg-gray-700 text-white pl-2 text-left;
+  @apply invisible absolute w-auto h-auto z-50 inline-block text-sm rounded-lg bg-gray-700 text-white pl-2 text-left;
 }
 
 .tooltip:hover .tooltip-text {
